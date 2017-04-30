@@ -1,2 +1,7 @@
+CC = gcc
+CFLAGS += `pkg-config --cflags tcl glib-2.0 libsodium`
+LDFLAGS += `pkg-config --libs tcl glib-2.0 libsodium`
 main:
-	gcc -shared -fPIC -o libfishdance.so -DUSE_TCL_STUBS `pkg-config --cflags tcl` `pkg-config --cflags glib-2.0` libfishdance_tcl.c XSalsa20Poly1305.c -ltclstub86 -lsodium -lglib-2.0
+	$(CC) -shared -fPIC -o libfishdance.so -DUSE_TCL_STUBS $(CFLAGS) libfishdance_tcl.c XSalsa20Poly1305.c $(LDFLAGS)
+clean:
+	rm libfishdance.so
