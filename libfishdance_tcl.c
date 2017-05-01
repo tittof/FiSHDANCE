@@ -2,8 +2,6 @@
 #include <tcl.h>
 #include <sodium.h>
 #include <glib.h>
-#include <string.h>
-#include <stdlib.h>
 
 static int
 Fishdance_encrypt_Cmd(ClientData cdata, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[])
