@@ -31,7 +31,10 @@ Fishdance_decrypt_Cmd(ClientData cdata, Tcl_Interp *interp, int objc, Tcl_Obj *c
     char bf_dest[1000] = "";
     if (!key || !key[0])
         return 0;
-    decrypt_string_xs(key, str, bf_dest, strlen(str));
+    if (decrypt_string_xs(key, str, bf_dest, strlen(str))) {
+        /* decryption failed */
+        return TCL_ERROR;
+    }
     Tcl_SetObjResult(interp, Tcl_NewStringObj(bf_dest, -1));
     return TCL_OK;
 }
