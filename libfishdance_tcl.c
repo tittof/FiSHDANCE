@@ -14,8 +14,6 @@ Fishdance_encrypt_Cmd(ClientData cdata, Tcl_Interp *interp, int objc, Tcl_Obj *c
     const char *key = Tcl_GetString(objv[1]);
     const char *str = Tcl_GetString(objv[2]);
     char bf_dest[1000] = "";
-    char *dest;
-    int len = strlen(str);
     if (!key || !key[0])
         return 0;
     /* strcpy(bf_dest, "+OK "); */
@@ -33,8 +31,6 @@ Fishdance_decrypt_Cmd(ClientData cdata, Tcl_Interp *interp, int objc, Tcl_Obj *c
     const char *key = Tcl_GetString(objv[1]);
     const char *str = Tcl_GetString(objv[2]);
     char bf_dest[1000] = "";
-    char *dest;
-    int len = strlen(str);
     if (!key || !key[0])
         return 0;
     decrypt_string_xs(key, str, bf_dest, strlen(str));

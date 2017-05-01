@@ -1,4 +1,4 @@
-CC = gcc
+CC = gcc -O2 -DPOSIX -Wall -Wformat -fstack-protector-all -DSSP
 CFLAGS += `pkg-config --cflags tcl glib-2.0 libsodium`
 LDFLAGS += `pkg-config --libs tcl glib-2.0 libsodium`
 main:
