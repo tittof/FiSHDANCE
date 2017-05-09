@@ -8,7 +8,6 @@ Fishdance_encrypt_Cmd(ClientData cdata, Tcl_Interp *interp, int objc, Tcl_Obj *c
 {
     if (objc != 3)
         return TCL_ERROR;
-    if (sodium_init() == -1) { return TCL_ERROR; }
     const char *key = Tcl_GetString(objv[1]);
     const char *str = Tcl_GetString(objv[2]);
     char bf_dest[1000] = "";
@@ -25,16 +24,12 @@ Fishdance_decrypt_Cmd(ClientData cdata, Tcl_Interp *interp, int objc, Tcl_Obj *c
 {
     if (objc != 3)
         return TCL_ERROR;
-    if (sodium_init() == -1) { return TCL_ERROR; }
     const char *key = Tcl_GetString(objv[1]);
     const char *str = Tcl_GetString(objv[2]);
     char bf_dest[1000] = "";
     if (!key || !key[0])
         return 0;
-    if (decrypt_string_xs(key, str, bf_dest, strlen(str))) {
-        /* decryption failed */
-        return TCL_ERROR;
-    }
+    decrypt_string_xs(key, str, bf_dest, strlen(str));
     Tcl_SetObjResult(interp, Tcl_NewStringObj(bf_dest, -1));
     return TCL_OK;
 }
