@@ -5,11 +5,15 @@
 int decrypt_string_xs(const char *key, const char *str, char *dest, int len) {
     if (!key || !key[0])
         return 0;
-    gsize out_len;
+    gsize out_len = 0;
     guchar * nonce_ciphertext;
     /* base64 decode the message */
     nonce_ciphertext = g_base64_decode(str, &out_len);
     int MESSAGE_LEN = out_len-(crypto_secretbox_NONCEBYTES+crypto_secretbox_MACBYTES);
+    if (MESSAGE_LEN < 1) {
+      g_free(nonce_ciphertext);
+      return 0;
+    }
     int CIPHERTEXT_LEN = crypto_secretbox_MACBYTES + MESSAGE_LEN;
     /* split it into nonce and ciphertext again */
     unsigned char nonce[crypto_secretbox_NONCEBYTES];
