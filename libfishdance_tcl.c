@@ -15,7 +15,7 @@ Fishdance_encrypt_Cmd(ClientData cdata, Tcl_Interp *interp, int objc, Tcl_Obj *c
     if (!key || !key[0])
         return 0;
     /* strcpy(bf_dest, "+OK "); */
-    if (encrypt_string_xs(key, str, bf_dest, strlen(str)) == 0);
+    encrypt_string_xs(key, str, bf_dest, strlen(str));
     Tcl_SetObjResult(interp, Tcl_NewStringObj(bf_dest, -1));
     return TCL_OK;
 }
