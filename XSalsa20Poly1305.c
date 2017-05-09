@@ -15,7 +15,7 @@ int decrypt_string_xs(const char *key, const char *str, char *dest, int len) {
        pwgen -s 1048576|xz -9ve -|wc -c
        796718
        echo "45*8*796718/1048576"|bc
-       result is 273 (Bits of security)
+       result is 273 (Bits of entropy)
 
        so use pwgen -ns1 45 to get a good password
 
