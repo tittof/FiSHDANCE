@@ -1,7 +1,8 @@
 #include "XSalsa20Poly1305.h"
 #include <sodium.h>
 #include <glib.h>
-
+#include <sys/time.h>
+#include <stdio.h>
 int decrypt_string_xs(const char *key, const char *str, char *dest, int len) {
     if (!key || !key[0])
         return 0;
@@ -43,6 +44,23 @@ int decrypt_string_xs(const char *key, const char *str, char *dest, int len) {
     if (crypto_secretbox_open_easy((unsigned char*)dest, ciphertext, CIPHERTEXT_LEN, nonce, hash) != 0) {
         /* cannot decrypt */
         return 1;
+    } else {
+        /* successfully decrypted but... what's the timestamp? */
+        unsigned long long millisecondsSinceEpochReceived = 0;
+        /* get those 8 bytes out of the nonce */
+        memcpy(&millisecondsSinceEpochReceived, nonce, sizeof millisecondsSinceEpochReceived);
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        /* we cast it to long long for year 2038 */
+        unsigned long long millisecondsSinceEpoch =
+            (unsigned long long)(tv.tv_sec) * 1000 +
+            (unsigned long long)(tv.tv_usec) / 1000;
+        /* printf("%llu milliseconds old\n", millisecondsSinceEpoch-millisecondsSinceEpochReceived); */
+        /* messages that are older than 10000ms are discarded */
+        if (millisecondsSinceEpoch-millisecondsSinceEpochReceived > 10000) {
+            snprintf(dest, 34, "message too old (%013llums)", millisecondsSinceEpoch-millisecondsSinceEpochReceived);
+            return 0;
+        }
     }
     return 0;
 }
@@ -57,6 +75,15 @@ int encrypt_string_xs(const char *key, const char *str, char *dest, int len) {
     unsigned char ciphertext[crypto_secretbox_MACBYTES+len];
     /* choosing a random nonce */
     randombytes_buf(nonce, crypto_secretbox_NONCEBYTES);
+    /* get 8 bytes of timestamp to mitigate risk of replay attacks */
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    /* we cast it to long long for year 2038 */
+    unsigned long long millisecondsSinceEpoch =
+        (unsigned long long)(tv.tv_sec) * 1000 +
+        (unsigned long long)(tv.tv_usec) / 1000;
+    /* put those 8 bytes into the nonce keeping 16 random bytes */
+    memcpy(nonce, &millisecondsSinceEpoch, sizeof millisecondsSinceEpoch);
     /* hash the password to get crypto_secretbox_KEYBYTES */
     unsigned char hash[crypto_secretbox_KEYBYTES];
     crypto_generichash(hash, sizeof hash, (unsigned char*)key, sizeof key, NULL, 0);
