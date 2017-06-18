@@ -55,12 +55,20 @@ int decrypt_string_xs(const char *key, const char *str, char *dest, int len) {
         unsigned long long millisecondsSinceEpoch =
             (unsigned long long)(tv.tv_sec) * 1000 +
             (unsigned long long)(tv.tv_usec) / 1000;
-        /* printf("%llu milliseconds old\n", millisecondsSinceEpoch-millisecondsSinceEpochReceived); */
-        /* messages that are older than 10000ms are discarded */
-        if (millisecondsSinceEpoch-millisecondsSinceEpochReceived > 10000) {
-            snprintf(dest, 34, "message too old (%013llums)", millisecondsSinceEpoch-millisecondsSinceEpochReceived);
-            return 0;
+        /* messages that are more than 10000ms in the future are discarded */
+        if (millisecondsSinceEpoch < millisecondsSinceEpochReceived) {
+            if (millisecondsSinceEpochReceived-millisecondsSinceEpoch > 10000) {
+                snprintf(dest, 34, "message too new (%013llums)", millisecondsSinceEpochReceived-millisecondsSinceEpoch);
+                return 0;
+            }
+        } else {
+            /* messages that are older than 10000ms are discarded */
+            if (millisecondsSinceEpoch-millisecondsSinceEpochReceived > 10000) {
+                snprintf(dest, 34, "message too old (%013llums)", millisecondsSinceEpoch-millisecondsSinceEpochReceived);
+                return 0;
+            }
         }
+
     }
     return 0;
 }
